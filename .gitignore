@@ -1,35 +1,30 @@
-# Python
-__pycache__/
-*.py[cod]
-.venv/
-venv/
+# Experiment outputs
+results/
+outputs/
+checkpoints/
 
-# Jupyter
-.ipynb_checkpoints/
-
-# Data
+# Generated data
 data/
+
+# Compressed files
 *.zip
 *.tar
 *.tar.gz
-*.csv
 
-# Model outputs
-outputs/
-results/
-checkpoints/
+# Model files
 *.pt
 *.pth
 *.onnx
 *.tflite
 
-# Images / generated artifacts
-*.png
-*.jpg
-*.jpeg
+# Notebook checkpoints
+.ipynb_checkpoints/
 
-# Logs
-*.log
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
 
 # OS / IDE
 .DS_Store
