@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data
+data/
+*.zip
+*.tar
+*.tar.gz
+*.csv
+
+# Model outputs
+outputs/
+*.pt
+*.pth
+*.onnx
+*.tflite
+
+# OS / IDE
+.DS_Store
+.vscode/
