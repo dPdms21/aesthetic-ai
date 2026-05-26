@@ -1,0 +1,2 @@
+experiment,dataset,train_size,val_size,low_rule,high_rule,model,pretraining,training_strategy,epochs,best_val_acc,final_val_acc,note
+resnet18_full_finetuning_sample1000,AVA sample,800,200,score <= 4.0,score >= 6.5,ResNet18,ImageNet,full fine-tuning,5,0.885,0.885,Initial baseline experiment using strict high/low AVA samples.

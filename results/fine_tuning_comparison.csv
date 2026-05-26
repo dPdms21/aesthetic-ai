@@ -1,0 +1,3 @@
+experiment,model,trainable_layers,best_val_acc,final_val_acc
+full_fine_tuning,ResNet18,all layers,0.885,0.885
+feature_extraction,ResNet18,fc layer only,0.585,0.585

@@ -1,0 +1,62 @@
+[
+  {
+    "experiment": "Experiment 02 baseline",
+    "feature": "ResNet18 grid image",
+    "input_dim": "-",
+    "best_val_acc": 0.6818,
+    "final_val_acc": 0.6818,
+    "final_val_loss": null,
+    "confusion_matrix": "[[193, 63], [91, 137]]",
+    "interpretation": "Grid image 기반 착장 조화 baseline"
+  },
+  {
+    "experiment": "Experiment 03 - Step 6",
+    "feature": "CLIP mean pooling + MLP",
+    "input_dim": 512,
+    "best_val_acc": 0.6777,
+    "final_val_acc": 0.6756,
+    "final_val_loss": 0.588,
+    "confusion_matrix": "[[172, 84], [73, 155]]",
+    "interpretation": "CLIP item embedding은 유효하지만 단순 mean pooling은 grid baseline을 넘지 못함"
+  },
+  {
+    "experiment": "Experiment 03 - Step 8",
+    "feature": "CLIP mean + max pooling + MLP",
+    "input_dim": 1024,
+    "best_val_acc": 0.657,
+    "final_val_acc": null,
+    "final_val_loss": null,
+    "confusion_matrix": null,
+    "interpretation": "Feature 차원 증가와 max pooling 영향으로 성능 하락"
+  },
+  {
+    "experiment": "Experiment 03 - Step 9",
+    "feature": "CLIP mean pooling + tuned MLP",
+    "input_dim": 512,
+    "best_val_acc": 0.6157,
+    "final_val_acc": null,
+    "final_val_loss": null,
+    "confusion_matrix": null,
+    "interpretation": "강한 regularization으로 인해 언더피팅 가능성 확인"
+  },
+  {
+    "experiment": "Experiment 03 - Step 11",
+    "feature": "CLIP mean pooling + pairwise relation stats + MLP",
+    "input_dim": 518,
+    "best_val_acc": 0.7128,
+    "final_val_acc": 0.7128,
+    "final_val_loss": 0.5651,
+    "confusion_matrix": "[[197, 59], [80, 148]]",
+    "interpretation": "Item 간 관계 정보를 반영하여 grid baseline 대비 약 3.1%p 개선"
+  },
+  {
+    "experiment": "Experiment 03 - Step 14",
+    "feature": "CLIP mean pooling + pairwise relation stats + color stats + MLP",
+    "input_dim": 528,
+    "best_val_acc": 0.7727,
+    "final_val_acc": 0.7727,
+    "final_val_loss": 0.4922,
+    "confusion_matrix": "[[203, 53], [57, 171]]",
+    "interpretation": "Item 간 관계 정보와 색감 통계 정보를 함께 반영하여 최종 최고 성능 달성"
+  }
+]
