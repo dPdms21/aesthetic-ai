@@ -1,0 +1,9 @@
+{
+  "total_samples": 484,
+  "compatible_predictions": 231,
+  "incompatible_predictions": 253,
+  "average_overall_score": 47.03,
+  "average_color_harmony_score": 52.52,
+  "average_item_relation_score": 79.88,
+  "average_style_consistency_score": 83.34
+}

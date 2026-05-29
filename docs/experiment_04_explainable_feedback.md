@@ -254,3 +254,110 @@ dress-shoes
 보정 후 샘플 출력에서는 compatible 확률이 높은 sample이 높은 overall score와 하위 점수를 가지며, 낮은 sample은 색감 조화, 아이템 관계, 스타일 통일감 중 일부에서 낮은 점수를 보였다.
 
 이를 통해 Experiment 03의 feature group을 Experiment 04의 설명 가능한 하위 점수 구조로 변환할 수 있음을 확인하였다.
+
+---
+
+## 12. 실제 validation sample 기반 피드백 생성
+
+이전 단계까지는 테스트용 sample과 임시 feature dict를 사용하여 피드백 생성 구조가 정상적으로 동작하는지 확인하였다.
+
+이번 단계에서는 Experiment 03에서 생성한 실제 validation sample별 예측 확률과 feature stats를 사용하여, 전체 validation set에 대한 피드백을 생성하였다.
+
+사용한 입력 파일은 다음과 같다.
+
+```text
+results/experiment_03_validation_feedback_inputs.csv
+```
+
+이 파일에는 validation sample별로 다음 정보가 포함되어 있다.
+
+| 항목 | 설명 |
+|---|---|
+| `sample_id` | validation sample 식별자 |
+| `true_label` | 실제 compatibility label |
+| `pred_label` | Experiment 03 최종 모델의 예측 label |
+| `compatible_probability` | compatible class에 대한 예측 확률 |
+| color harmony stats | RGB/HSV 기반 색감 조화 feature |
+| pairwise relation stats | item embedding 간 관계 feature |
+| category-aware relation stats | 주요 category pair 간 관계 feature |
+
+피드백 생성기는 위 입력값을 읽어 각 validation sample에 대해 다음 결과를 생성하였다.
+
+```text
+results/experiment_04_validation_feedback_samples.json
+results/experiment_04_validation_feedback_preview.json
+results/experiment_04_validation_feedback_summary.json
+```
+
+### 12.1 생성 결과 요약
+
+실제 validation sample 484개에 대해 피드백을 생성한 결과는 다음과 같다.
+
+| 항목 | 값 |
+|---|---:|
+| 전체 sample 수 | 484 |
+| compatible 예측 수 | 231 |
+| incompatible 예측 수 | 253 |
+| 평균 overall score | 47.03 |
+| 평균 color harmony score | 52.52 |
+| 평균 item relation score | 79.88 |
+| 평균 style consistency score | 83.34 |
+
+전체 validation sample에 대해 overall score, color harmony score, item relation score, style consistency score와 rule-based feedback 문장이 정상적으로 생성되었다.
+
+### 12.2 Preview 결과 확인
+
+생성된 preview 결과를 확인한 결과, sample별로 다음 정보가 함께 저장되었다.
+
+```text
+sample_id
+true_label
+pred_label
+overall_score
+color_harmony_score
+item_relation_score
+style_consistency_score
+compatible_probability
+prediction
+confidence
+summary_feedback
+color_feedback
+item_relation_feedback
+style_feedback
+```
+
+예를 들어 compatible 확률이 높은 sample은 높은 overall score와 함께 전체적으로 조화로운 착장이라는 피드백을 생성하였다.
+
+반대로 compatible 확률이 낮은 sample은 낮은 overall score와 함께 전체적인 조화가 부족해 보일 수 있다는 피드백을 생성하였다.
+
+또한 color harmony score가 낮은 경우에는 색 조합의 충돌이나 색감 연결의 어색함을 설명하는 피드백이 생성되었다.
+
+### 12.3 결과 해석
+
+실제 validation sample 기반 피드백 생성 결과, Experiment 03의 예측 확률과 feature stats를 Experiment 04의 사용자 친화적 피드백 구조로 변환할 수 있음을 확인하였다.
+
+다만 평균 점수를 보면 `item_relation_score`와 `style_consistency_score`가 전반적으로 높게 산출되는 경향이 있었다.
+
+이는 현재 rule-based scoring 방식에서 item embedding 간 유사도와 category-aware relation score가 비교적 후하게 반영되기 때문으로 볼 수 있다.
+
+따라서 현재 구조는 설명 가능한 피드백 생성의 기본 흐름을 검증하는 데 의미가 있으며, 향후에는 실제 사용자 평가나 더 많은 sample 분석을 바탕으로 하위 점수 계산식을 추가 보정할 필요가 있다.
+
+### 12.4 정리
+
+이번 단계에서는 테스트용 입력이 아니라 실제 Experiment 03 validation sample 484개를 사용하여 피드백을 생성하였다.
+
+이를 통해 Experiment 04의 피드백 생성 구조가 실제 모델 결과와 연결될 수 있음을 확인하였다.
+
+Experiment 04는 최종적으로 다음 흐름을 구성하였다.
+
+```text
+Experiment 03 validation prediction + feature stats
+→ overall score 변환
+→ color harmony score 계산
+→ item relation score 계산
+→ style consistency score 계산
+→ rule-based feedback 생성
+→ validation feedback json 저장
+```
+
+이로써 Experiment 04는 단순한 compatible / incompatible 예측 결과를 사용자에게 설명 가능한 착장 미감 피드백으로 변환하는 구조를 완성하였다.
