@@ -357,7 +357,33 @@ Experiment 03 validation prediction + feature stats
 → item relation score 계산
 → style consistency score 계산
 → rule-based feedback 생성
+→ feature 기반 reason-aware feedback 개선
 → validation feedback json 저장
 ```
 
 이로써 Experiment 04는 단순한 compatible / incompatible 예측 결과를 사용자에게 설명 가능한 착장 미감 피드백으로 변환하는 구조를 완성하였다.
+
+---
+
+## 13. Feature 기반 reason-aware feedback 개선
+
+초기 피드백 생성기는 점수 구간에 따라 고정된 rule-based 문장을 생성하였다.
+
+이 방식은 전체 피드백 구조를 검증하는 데는 적합했지만, 같은 점수 구간에 속한 sample들이 유사한 피드백 문장을 반복적으로 생성하는 한계가 있었다.
+
+이를 보완하기 위해 color stats, pairwise relation stats, category-aware relation stats에서 주요 원인을 추출하여 피드백 문장에 함께 반영하였다.
+
+개선 후 피드백은 다음과 같은 정보를 포함한다.
+
+| 피드백 항목 | 개선 내용 |
+|---|---|
+| `color_feedback` | RGB/HSV feature 중 색감 조화에 가장 큰 영향을 준 요인을 설명 |
+| `item_relation_feedback` | item embedding 간 평균 유사도, 최소 유사도, 편차, range를 기반으로 아이템 관계 원인을 설명 |
+| `style_feedback` | category-aware relation stats에서 강하거나 약한 category pair를 설명 |
+| `detailed_feedback` | 전체 점수와 가장 약한 하위 점수를 바탕으로 종합 보완 방향 제시 |
+
+예를 들어 color harmony score가 낮고 RGB 평균 거리가 큰 경우, 단순히 색감이 어색하다고 말하는 대신 아이템 간 전체적인 색 차이가 큰 편이라는 이유를 함께 제공한다.
+
+또한 style consistency score에서는 top-bottom, main-shoes, bottom-shoes, bag-main 등의 category pair 중 어떤 조합이 스타일 통일감에 긍정적이거나 부정적으로 작용했는지 설명하도록 개선하였다.
+
+이를 통해 Experiment 04의 피드백 생성기는 단순 점수 구간 기반 템플릿에서, feature 값에 기반한 reason-aware feedback 구조로 확장되었다.

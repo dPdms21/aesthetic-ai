@@ -63,6 +63,147 @@ def get_confidence(compatible_probability: float) -> float:
     return round(confidence, 4)
 
 
+def get_color_reason(color_stats: Dict[str, float]) -> str:
+    """
+    color stats 중 가장 큰 감점 원인을 찾아 색감 피드백 이유를 생성한다.
+    """
+
+    penalty_map = {
+        "rgb_mean_distance": color_stats.get("rgb_mean_distance", 0.3) * 55,
+        "rgb_std_distance": color_stats.get("rgb_std_distance", 0.1) * 40,
+        "hue_std": color_stats.get("hue_std", 0.15) * 35,
+        "saturation_std": color_stats.get("saturation_std", 0.2) * 25,
+        "value_std": color_stats.get("value_std", 0.2) * 20,
+    }
+
+    main_factor = max(penalty_map, key=penalty_map.get)
+
+    reason_map = {
+        "rgb_mean_distance": "아이템 간 전체적인 색 차이가 큰 편입니다.",
+        "rgb_std_distance": "아이템별 색 차이의 편차가 있어 일부 색상이 따로 보일 수 있습니다.",
+        "hue_std": "색상 톤의 변화가 커서 전체 색감이 분산되어 보일 수 있습니다.",
+        "saturation_std": "채도 차이가 있어 일부 아이템이 더 튀어 보일 수 있습니다.",
+        "value_std": "밝기 차이가 있어 착장의 톤 균형이 약해 보일 수 있습니다.",
+    }
+
+    return reason_map[main_factor]
+
+
+def get_item_relation_reason(pairwise_stats: Dict[str, float]) -> str:
+    """
+    pairwise relation stats를 기반으로 아이템 관계 피드백 이유를 생성한다.
+    """
+
+    mean_similarity = pairwise_stats.get("mean_similarity", 0.5)
+    min_similarity = pairwise_stats.get("min_similarity", 0.3)
+    std_similarity = pairwise_stats.get("std_similarity", 0.1)
+    range_similarity = pairwise_stats.get("range_similarity", 0.3)
+
+    if min_similarity < 0.25:
+        return "일부 아이템 pair의 유사도가 낮아 특정 아이템이 전체 착장과 분리되어 보일 수 있습니다."
+
+    if range_similarity > 0.45:
+        return "아이템 간 유사도 차이가 커서 조합의 일관성이 약해질 수 있습니다."
+
+    if std_similarity > 0.18:
+        return "아이템 간 관계의 편차가 있어 일부 조합은 자연스럽지 않을 수 있습니다."
+
+    if mean_similarity >= 0.75:
+        return "전체 아이템 간 평균 유사도가 높아 하나의 착장으로 자연스럽게 연결됩니다."
+
+    return "전체적인 아이템 관계는 무난하지만, 일부 조합은 더 강한 연결감이 필요할 수 있습니다."
+
+
+def get_style_reason(category_stats: Dict[str, Dict[str, float]]) -> str:
+    """
+    category-aware relation stats에서 가장 약한 category pair를 찾아 스타일 피드백 이유를 생성한다.
+    """
+
+    pair_display_names = {
+        "top_bottom": "상의와 하의",
+        "main_shoes": "주요 의상과 신발",
+        "bottom_shoes": "하의와 신발",
+        "top_shoes": "상의와 신발",
+        "bag_main": "가방과 주요 의상",
+        "outer_main": "아우터와 주요 의상",
+        "accessory_main": "액세서리와 주요 의상",
+        "dress_shoes": "드레스와 신발",
+    }
+
+    available_pairs = []
+
+    for pair_name, pair_stat in category_stats.items():
+        if pair_stat.get("available", 0) != 1:
+            continue
+
+        mean_similarity = pair_stat.get("mean_similarity", 0.5)
+        min_similarity = pair_stat.get("min_similarity", 0.3)
+        std_similarity = pair_stat.get("std_similarity", 0.1)
+
+        pair_score = 50
+        pair_score += mean_similarity * 40
+        pair_score += min_similarity * 15
+        pair_score -= std_similarity * 25
+
+        available_pairs.append((pair_name, pair_score, mean_similarity, min_similarity, std_similarity))
+
+    if not available_pairs:
+        return "비교 가능한 주요 카테고리 조합이 부족해 스타일 통일감을 중립적으로 평가했습니다."
+
+    weakest_pair = min(available_pairs, key=lambda x: x[1])
+    strongest_pair = max(available_pairs, key=lambda x: x[1])
+
+    weakest_name = pair_display_names.get(weakest_pair[0], weakest_pair[0])
+    strongest_name = pair_display_names.get(strongest_pair[0], strongest_pair[0])
+
+    if weakest_pair[1] < 60:
+        return f"{weakest_name} 조합의 유사도가 낮아 해당 부분에서 스타일 방향이 다르게 느껴질 수 있습니다."
+
+    if strongest_pair[1] >= 85:
+        return f"{strongest_name} 조합이 안정적이어서 전체 스타일 통일감에 긍정적으로 작용합니다."
+
+    return f"{weakest_name} 조합은 상대적으로 약하지만, 전체적인 스타일 방향은 크게 벗어나지 않습니다."
+
+
+def generate_detailed_feedback(
+    overall_score: int,
+    color_score: int,
+    relation_score: int,
+    style_score: int,
+) -> str:
+    """
+    가장 약한 하위 점수를 기준으로 종합 보완 피드백을 생성한다.
+    """
+
+    score_map = {
+        "color": color_score,
+        "relation": relation_score,
+        "style": style_score,
+    }
+
+    weakest_area = min(score_map, key=score_map.get)
+
+    if overall_score >= 80:
+        if weakest_area == "color":
+            return "전체적인 착장 조화는 좋지만, 색감 연결을 조금 더 정리하면 완성도가 더 높아질 수 있습니다."
+        if weakest_area == "relation":
+            return "전체적으로 조화로운 착장이지만, 일부 아이템 간 연결감을 보완하면 더 자연스러워질 수 있습니다."
+        return "전체적인 완성도는 높지만, 일부 카테고리 조합의 스타일 방향을 맞추면 더 안정적인 착장이 될 수 있습니다."
+
+    if overall_score >= 60:
+        if weakest_area == "color":
+            return "전반적으로 무난한 착장이지만, 색 조합이 가장 큰 보완 포인트로 보입니다."
+        if weakest_area == "relation":
+            return "전반적인 착장은 안정적이나, 일부 아이템 조합의 연결성이 다소 약할 수 있습니다."
+        return "전반적으로 무난하지만, 스타일 방향을 조금 더 통일하면 더 완성도 있는 착장이 될 수 있습니다."
+
+    if weakest_area == "color":
+        return "전체 조화가 약한 편이며, 특히 색감 연결을 먼저 정리하는 것이 좋습니다."
+    if weakest_area == "relation":
+        return "전체 조화가 약한 편이며, 아이템 간 관계가 자연스럽게 이어지도록 조합을 조정하는 것이 좋습니다."
+    return "전체 조화가 약한 편이며, 착장의 스타일 방향을 더 명확히 잡는 것이 좋습니다."
+
+
 def calculate_color_harmony_score(color_stats: Dict[str, float]) -> int:
     """
     color harmony stats를 기반으로 색감 조화 점수를 계산한다.
@@ -183,49 +324,58 @@ def generate_summary_feedback(overall_score: int) -> str:
     return feedback_map[level]
 
 
-def generate_color_feedback(color_score: int) -> str:
+def generate_color_feedback(color_score: int, color_stats: Dict[str, float]) -> str:
     """
-    색감 조화 점수 기반 피드백을 생성한다.
+    색감 조화 점수와 color stats 기반 피드백을 생성한다.
     """
     level = get_score_level(color_score)
+    reason = get_color_reason(color_stats)
 
     feedback_map = {
-        "high": "색감 조합이 안정적이며 전체 톤이 자연스럽게 어울립니다.",
-        "medium": "색감은 전반적으로 무난하지만 일부 색상 대비가 살짝 느껴질 수 있습니다.",
-        "low": "일부 색상이 전체 착장과 자연스럽게 연결되지 않을 수 있습니다.",
-        "very_low": "색 조합에서 다소 충돌이 느껴질 수 있습니다.",
+        "high": f"색감 조합이 안정적이며 전체 톤이 자연스럽게 어울립니다. {reason}",
+        "medium": f"색감은 전반적으로 무난하지만 일부 색상 대비가 느껴질 수 있습니다. {reason}",
+        "low": f"일부 색상이 전체 착장과 자연스럽게 연결되지 않을 수 있습니다. {reason}",
+        "very_low": f"색 조합에서 다소 충돌이 느껴질 수 있습니다. {reason}",
     }
 
     return feedback_map[level]
 
 
-def generate_item_relation_feedback(item_relation_score: int) -> str:
+def generate_item_relation_feedback(
+    item_relation_score: int,
+    pairwise_stats: Dict[str, float],
+) -> str:
     """
-    아이템 간 관계 점수 기반 피드백을 생성한다.
+    아이템 간 관계 점수와 pairwise stats 기반 피드백을 생성한다.
     """
     level = get_score_level(item_relation_score)
+    reason = get_item_relation_reason(pairwise_stats)
 
     feedback_map = {
-        "high": "아이템 간 시각적 관계가 자연스럽고 조합이 잘 맞습니다.",
-        "medium": "대부분의 아이템은 잘 어울리지만 일부 조합은 조금 약할 수 있습니다.",
-        "low": "몇몇 아이템이 하나의 착장으로 자연스럽게 연결되지 않을 수 있습니다.",
-        "very_low": "아이템 간 조화가 부족해 전체 착장이 분리되어 보일 수 있습니다.",
+        "high": f"아이템 간 시각적 관계가 자연스럽고 조합이 잘 맞습니다. {reason}",
+        "medium": f"대부분의 아이템은 잘 어울리지만 일부 조합은 조금 약할 수 있습니다. {reason}",
+        "low": f"몇몇 아이템이 하나의 착장으로 자연스럽게 연결되지 않을 수 있습니다. {reason}",
+        "very_low": f"아이템 간 조화가 부족해 전체 착장이 분리되어 보일 수 있습니다. {reason}",
     }
 
     return feedback_map[level]
 
 
-def generate_style_feedback(style_score: int) -> str:
+def generate_style_feedback(
+    style_score: int,
+    category_stats: Dict[str, Dict[str, float]],
+) -> str:
     """
-    스타일 통일감 점수 기반 피드백을 생성한다.
+    스타일 통일감 점수와 category-aware relation stats 기반 피드백을 생성한다.
     """
     level = get_score_level(style_score)
+    reason = get_style_reason(category_stats)
 
     feedback_map = {
-        "high": "상의, 하의, 신발 등 주요 카테고리 간 스타일 통일감이 좋은 편입니다.",
-        "medium": "전체적인 스타일 방향은 대체로 일관적입니다.",
-        "low": "일부 아이템의 스타일 방향이 서로 다르게 느껴질 수 있습니다.",
-        "very_low": "착장의 스타일 방향이 명확하지 않아 통일감이 약해 보일 수 있습니다.",
+        "high": f"주요 카테고리 간 스타일 통일감이 좋은 편입니다. {reason}",
+        "medium": f"전체적인 스타일 방향은 대체로 일관적입니다. {reason}",
+        "low": f"일부 아이템의 스타일 방향이 서로 다르게 느껴질 수 있습니다. {reason}",
+        "very_low": f"착장의 스타일 방향이 명확하지 않아 통일감이 약해 보일 수 있습니다. {reason}",
     }
 
     return feedback_map[level]
@@ -300,9 +450,15 @@ def build_feedback_result(
         "prediction": get_prediction_label(compatible_probability),
         "confidence": get_confidence(compatible_probability),
         "summary_feedback": generate_summary_feedback(overall_score),
-        "color_feedback": generate_color_feedback(color_score),
-        "item_relation_feedback": generate_item_relation_feedback(relation_score),
-        "style_feedback": generate_style_feedback(style_score),
+        "color_feedback": generate_color_feedback(color_score, color_stats),
+        "item_relation_feedback": generate_item_relation_feedback(relation_score, pairwise_stats),
+        "style_feedback": generate_style_feedback(style_score, category_stats),
+        "detailed_feedback": generate_detailed_feedback(
+            overall_score=overall_score,
+            color_score=color_score,
+            relation_score=relation_score,
+            style_score=style_score,
+        ),
     }
 
     return result
