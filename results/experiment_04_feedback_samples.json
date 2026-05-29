@@ -1,0 +1,67 @@
+[
+  {
+    "sample_id": 0,
+    "overall_score": 83,
+    "color_harmony_score": 77,
+    "item_relation_score": 86,
+    "style_consistency_score": 89,
+    "prediction": "compatible",
+    "confidence": 0.8285,
+    "summary_feedback": "전체적으로 아이템 간 조화가 좋은 착장입니다.",
+    "color_feedback": "색감은 전반적으로 무난하지만 일부 색상 대비가 살짝 느껴질 수 있습니다.",
+    "item_relation_feedback": "아이템 간 시각적 관계가 자연스럽고 조합이 잘 맞습니다.",
+    "style_feedback": "상의, 하의, 신발 등 주요 카테고리 간 스타일 통일감이 좋은 편입니다."
+  },
+  {
+    "sample_id": 1,
+    "overall_score": 71,
+    "color_harmony_score": 68,
+    "item_relation_score": 75,
+    "style_consistency_score": 83,
+    "prediction": "compatible",
+    "confidence": 0.7128,
+    "summary_feedback": "전반적으로 무난하고 안정적인 착장입니다.",
+    "color_feedback": "색감은 전반적으로 무난하지만 일부 색상 대비가 살짝 느껴질 수 있습니다.",
+    "item_relation_feedback": "대부분의 아이템은 잘 어울리지만 일부 조합은 조금 약할 수 있습니다.",
+    "style_feedback": "상의, 하의, 신발 등 주요 카테고리 간 스타일 통일감이 좋은 편입니다."
+  },
+  {
+    "sample_id": 2,
+    "overall_score": 44,
+    "color_harmony_score": 48,
+    "item_relation_score": 55,
+    "style_consistency_score": 68,
+    "prediction": "incompatible",
+    "confidence": 0.562,
+    "summary_feedback": "일부 아이템 조합에서 어색함이 느껴질 수 있습니다.",
+    "color_feedback": "일부 색상이 전체 착장과 자연스럽게 연결되지 않을 수 있습니다.",
+    "item_relation_feedback": "몇몇 아이템이 하나의 착장으로 자연스럽게 연결되지 않을 수 있습니다.",
+    "style_feedback": "전체적인 스타일 방향은 대체로 일관적입니다."
+  },
+  {
+    "sample_id": 3,
+    "overall_score": 28,
+    "color_harmony_score": 32,
+    "item_relation_score": 38,
+    "style_consistency_score": 57,
+    "prediction": "incompatible",
+    "confidence": 0.724,
+    "summary_feedback": "전체적인 조화가 부족해 보일 수 있는 착장입니다.",
+    "color_feedback": "색 조합에서 다소 충돌이 느껴질 수 있습니다.",
+    "item_relation_feedback": "아이템 간 조화가 부족해 전체 착장이 분리되어 보일 수 있습니다.",
+    "style_feedback": "일부 아이템의 스타일 방향이 서로 다르게 느껴질 수 있습니다."
+  },
+  {
+    "sample_id": 4,
+    "overall_score": 90,
+    "color_harmony_score": 85,
+    "item_relation_score": 96,
+    "style_consistency_score": 93,
+    "prediction": "compatible",
+    "confidence": 0.905,
+    "summary_feedback": "전체적으로 아이템 간 조화가 좋은 착장입니다.",
+    "color_feedback": "색감 조합이 안정적이며 전체 톤이 자연스럽게 어울립니다.",
+    "item_relation_feedback": "아이템 간 시각적 관계가 자연스럽고 조합이 잘 맞습니다.",
+    "style_feedback": "상의, 하의, 신발 등 주요 카테고리 간 스타일 통일감이 좋은 편입니다."
+  }
+]
