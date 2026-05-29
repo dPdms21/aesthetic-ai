@@ -1,0 +1,14 @@
+{
+  "model": "CLIP ViT-B/32 mean pooling + pairwise relation stats + color stats + category-aware relation stats + MLP classifier",
+  "seeds": [42, 123, 2026],
+  "mean_best_val_acc": 0.8264,
+  "min_best_val_acc": 0.8244,
+  "max_best_val_acc": 0.8285,
+  "accuracy_range": 0.0041,
+  "mean_macro_f1": 0.8256,
+  "best_overall_seed": 2026,
+  "best_overall_acc": 0.8285,
+  "baseline_experiment_02_resnet18_grid_best_val_acc": 0.6818,
+  "improvement_over_baseline_best": 0.1467,
+  "improvement_over_baseline_seed_mean": 0.1446
+}

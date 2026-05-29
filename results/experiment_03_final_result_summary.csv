@@ -1,7 +1,8 @@
-experiment,feature,input_dim,best_val_acc,final_val_acc,final_val_loss,confusion_matrix,interpretation
-Experiment 02 baseline,ResNet18 grid image,-,0.6818,0.6818,,"[[193, 63], [91, 137]]",Grid image 기반 착장 조화 baseline
-Experiment 03 - Step 6,CLIP mean pooling + MLP,512,0.6777,0.6756,0.588,"[[172, 84], [73, 155]]",CLIP item embedding은 유효하지만 단순 mean pooling은 grid baseline을 넘지 못함
-Experiment 03 - Step 8,CLIP mean + max pooling + MLP,1024,0.657,,,,Feature 차원 증가와 max pooling 영향으로 성능 하락
-Experiment 03 - Step 9,CLIP mean pooling + tuned MLP,512,0.6157,,,,강한 regularization으로 인해 언더피팅 가능성 확인
-Experiment 03 - Step 11,CLIP mean pooling + pairwise relation stats + MLP,518,0.7128,0.7128,0.5651,"[[197, 59], [80, 148]]",Item 간 관계 정보를 반영하여 grid baseline 대비 약 3.1%p 개선
-Experiment 03 - Step 14,CLIP mean pooling + pairwise relation stats + color stats + MLP,528,0.7727,0.7727,0.4922,"[[203, 53], [57, 171]]",Item 간 관계 정보와 색감 통계 정보를 함께 반영하여 최종 최고 성능 달성
+experiment,feature,input_dim,best_val_acc,final_val_acc,final_val_loss,macro_f1,confusion_matrix,interpretation
+Experiment 02 baseline,ResNet18 grid image,-,0.6818,0.6818,,,"[[193, 63], [91, 137]]",Grid image 기반 착장 조화 baseline
+Experiment 03 - Step 6,CLIP mean pooling + MLP,512,0.6777,0.6756,0.5880,0.6752,"[[172, 84], [73, 155]]",CLIP item embedding은 유효하지만 단순 mean pooling은 grid baseline을 넘지 못함
+Experiment 03 - Step 8,CLIP mean + max pooling + MLP,1024,0.6570,,,,,Feature 차원 증가와 max pooling 영향으로 성능 하락
+Experiment 03 - Step 9,CLIP mean pooling + tuned MLP,512,0.6157,,,,,강한 regularization으로 인해 언더피팅 가능성 확인
+Experiment 03 - Step 11,CLIP mean pooling + pairwise relation stats + MLP,518,0.7128,0.7128,0.5651,0.7098,"[[197, 59], [80, 148]]",Item 간 관계 정보를 반영하여 grid baseline 대비 약 3.1%p 개선
+Experiment 03 - Step 14,CLIP mean pooling + pairwise relation stats + color stats + MLP,528,0.7727,0.7727,0.4922,,"[[203, 53], [57, 171]]",Item 간 관계 정보와 색감 통계 정보를 함께 반영하여 성능 개선
+Experiment 03 - Step 19,CLIP mean pooling + pairwise relation stats + color stats + category-aware relation stats + MLP,568,0.8285,0.8285,0.4407,0.8271,"[[222, 34], [49, 179]]",Category별 item 관계를 반영하여 최종 최고 성능 달성
